@@ -491,7 +491,7 @@ namespace iter {
 #include <variant>
 
 namespace iter {
-  namespace impl1 {
+  namespace impl0 {
     // iterator_end_type<C> is the type of C's end iterator
     template <typename Container>
     using iterator_end_type = decltype(get_end(std::declval<Container&>()));
@@ -516,13 +516,13 @@ namespace iter {
 
     template <typename Container>
     using IteratorWrapper = typename IteratorWrapperImplType<Container,
-        std::is_same_v<impl1::iterator_type<Container>,
-            impl1::iterator_end_type<Container>>>::type;
+        std::is_same_v<impl0::iterator_type<Container>,
+            impl0::iterator_end_type<Container>>>::type;
   }
 }
 
 template <typename SubIter, typename SubEnd>
-class iter::impl1::IteratorWrapperImpl {
+class iter::impl0::IteratorWrapperImpl {
  private:
   static_assert(!std::is_same_v<SubIter, SubEnd>);
   SubIter& sub_iter() {
@@ -591,7 +591,7 @@ class iter::impl1::IteratorWrapperImpl {
 
 
 namespace iter {
-  namespace impl2 {
+  namespace impl0 {
     namespace detail {
       template <typename... Ts>
       std::tuple<iterator_deref<Ts>...> iterator_tuple_deref_helper(
@@ -651,7 +651,7 @@ namespace iter {
 // behave like some_collection<T> when iterated over or indexed
 
 namespace iter {
-  namespace impl3 {
+  namespace impl0 {
     template <typename T, typename = void>
     struct HasConstDeref : std::false_type {};
 

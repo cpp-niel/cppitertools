@@ -19,8 +19,8 @@ def add_header(header_name, index, included_headers, target_file):
 
 def add_internal_headers(included_headers, target_file): 
     internal_headers = ['iterbase', 'iterator_wrapper', 'iter_tuples', 'iteratoriterator']
-    for index, internal_header in enumerate(internal_headers):
-        add_header('internal/' + internal_header + '.hpp', index, included_headers, target_file)
+    for internal_header in internal_headers:
+        add_header('internal/' + internal_header + '.hpp', 0, included_headers, target_file)
 
 
 def add_headers(included_headers, target_file):
