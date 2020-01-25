@@ -25,52 +25,52 @@
 #endif
 
 namespace iter {
-  namespace impl {
+  namespace impl0 {
     namespace get_iters {
       // begin() for C arrays
       template <typename T, std::size_t N>
-      T* get_begin_impl(T (&array)[N], int) {
+      T* get_begin_impl0(T (&array)[N], int) {
         return array;
       }
 
       // Prefer member begin().
       template <typename T, typename I = decltype(std::declval<T&>().begin())>
-      I get_begin_impl(T& r, int) {
+      I get_begin_impl0(T& r, int) {
         return r.begin();
       }
 
       // Use ADL otherwises.
       template <typename T, typename I = decltype(begin(std::declval<T&>()))>
-      I get_begin_impl(T& r, long) {
+      I get_begin_impl0(T& r, long) {
         return begin(r);
       }
 
       template <typename T>
-      auto get_begin(T& t) -> decltype(get_begin_impl(std::declval<T&>(), 42)) {
-        return get_begin_impl(t, 42);
+      auto get_begin(T& t) -> decltype(get_begin_impl0(std::declval<T&>(), 42)) {
+        return get_begin_impl0(t, 42);
       }
 
       // end() for C arrays
       template <typename T, std::size_t N>
-      T* get_end_impl(T (&array)[N], int) {
+      T* get_end_impl0(T (&array)[N], int) {
         return array + N;
       }
 
       // Prefer member end().
       template <typename T, typename I = decltype(std::declval<T&>().end())>
-      I get_end_impl(T& r, int) {
+      I get_end_impl0(T& r, int) {
         return r.end();
       }
 
       // Use ADL otherwise.
       template <typename T, typename I = decltype(end(std::declval<T&>()))>
-      I get_end_impl(T& r, long) {
+      I get_end_impl0(T& r, long) {
         return end(r);
       }
 
       template <typename T>
-      auto get_end(T& t) -> decltype(get_end_impl(std::declval<T&>(), 42)) {
-        return get_end_impl(t, 42);
+      auto get_end(T& t) -> decltype(get_end_impl0(std::declval<T&>(), 42)) {
+        return get_end_impl0(t, 42);
       }
     }
     using get_iters::get_begin;
@@ -208,7 +208,7 @@ namespace iter {
     }
 
     template <typename Iter, typename EndIter, typename Distance>
-    void dumb_advance_impl(
+    void dumb_advance_impl0(
         Iter& iter, const EndIter& end, Distance distance, std::false_type) {
       for (Distance i(0); i < distance && iter != end; ++i) {
         ++iter;
@@ -216,7 +216,7 @@ namespace iter {
     }
 
     template <typename Iter, typename EndIter, typename Distance>
-    void dumb_advance_impl(
+    void dumb_advance_impl0(
         Iter& iter, const EndIter& end, Distance distance, std::true_type) {
       if (static_cast<Distance>(end - iter) < distance) {
         iter = end;
@@ -228,7 +228,7 @@ namespace iter {
     // iter will not be incremented past end
     template <typename Iter, typename EndIter, typename Distance = std::size_t>
     void dumb_advance(Iter& iter, const EndIter& end, Distance distance) {
-      dumb_advance_impl(iter, end, distance, is_random_access_iter<Iter>{});
+      dumb_advance_impl0(iter, end, distance, is_random_access_iter<Iter>{});
     }
 
     template <typename ForwardIt, typename Distance = std::size_t>
@@ -491,7 +491,7 @@ namespace iter {
 #include <variant>
 
 namespace iter {
-  namespace impl {
+  namespace impl1 {
     // iterator_end_type<C> is the type of C's end iterator
     template <typename Container>
     using iterator_end_type = decltype(get_end(std::declval<Container&>()));
@@ -516,13 +516,13 @@ namespace iter {
 
     template <typename Container>
     using IteratorWrapper = typename IteratorWrapperImplType<Container,
-        std::is_same_v<impl::iterator_type<Container>,
-            impl::iterator_end_type<Container>>>::type;
+        std::is_same_v<impl1::iterator_type<Container>,
+            impl1::iterator_end_type<Container>>>::type;
   }
 }
 
 template <typename SubIter, typename SubEnd>
-class iter::impl::IteratorWrapperImpl {
+class iter::impl1::IteratorWrapperImpl {
  private:
   static_assert(!std::is_same_v<SubIter, SubEnd>);
   SubIter& sub_iter() {
@@ -591,7 +591,7 @@ class iter::impl::IteratorWrapperImpl {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl2 {
     namespace detail {
       template <typename... Ts>
       std::tuple<iterator_deref<Ts>...> iterator_tuple_deref_helper(
@@ -651,7 +651,7 @@ namespace iter {
 // behave like some_collection<T> when iterated over or indexed
 
 namespace iter {
-  namespace impl {
+  namespace impl3 {
     template <typename T, typename = void>
     struct HasConstDeref : std::false_type {};
 
@@ -918,17 +918,17 @@ namespace iter {
 #include <vector>
 
 namespace iter {
-  namespace impl {
+  namespace impl11 {
     template <typename Container>
     class Chunker;
 
     using ChunkedFn = IterToolFnBindSizeTSecond<Chunker>;
   }
-  constexpr impl::ChunkedFn chunked{};
+  constexpr impl11::ChunkedFn chunked{};
 }
 
 template <typename Container>
-class iter::impl::Chunker {
+class iter::impl11::Chunker {
  private:
   Container container_;
   std::size_t chunk_size_;
@@ -1043,17 +1043,17 @@ class iter::impl::Chunker {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl12 {
     template <typename Container>
     class Batcher;
 
     using BatchedFn = IterToolFnBindSizeTSecond<Batcher>;
   }
-  constexpr impl::BatchedFn batched{};
+  constexpr impl12::BatchedFn batched{};
 }
 
 template <typename Container>
-class iter::impl::Batcher {
+class iter::impl12::Batcher {
  private:
   Container container_;
   std::size_t num_batches_;
@@ -1196,7 +1196,7 @@ class iter::impl::Batcher {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl13 {
     // Callable object that reverses the boolean result of another
     // callable, taking the object in a Container's iterator
     template <typename FilterFunc>
@@ -1226,12 +1226,12 @@ namespace iter {
 
     using FilterFalseFn = IterToolFnOptionalBindFirst<FilterFalsed, BoolTester>;
   }
-  constexpr impl::FilterFalseFn filterfalse{};
+  constexpr impl13::FilterFalseFn filterfalse{};
 }
 
 // Delegates to Filtered with PredicateFlipper<FilterFunc>
 template <typename FilterFunc, typename Container>
-class iter::impl::FilterFalsed
+class iter::impl13::FilterFalsed
     : public Filtered<PredicateFlipper<FilterFunc>, Container> {
   friend FilterFalseFn;
   FilterFalsed(FilterFunc in_filter_func, Container&& in_container)
@@ -1246,12 +1246,12 @@ class iter::impl::FilterFalsed
 
 
 namespace iter {
-  namespace impl {
+  namespace impl14 {
     template <typename TupleType, std::size_t... Is>
     class Zipped;
 
     template <typename TupleType, std::size_t... Is>
-    Zipped<TupleType, Is...> zip_impl(TupleType&&, std::index_sequence<Is...>);
+    Zipped<TupleType, Is...> zip_impl14(TupleType&&, std::index_sequence<Is...>);
   }
 
   template <typename... Containers>
@@ -1259,10 +1259,10 @@ namespace iter {
 }
 
 template <typename TupleType, std::size_t... Is>
-class iter::impl::Zipped {
+class iter::impl14::Zipped {
  private:
   TupleType containers_;
-  friend Zipped iter::impl::zip_impl<TupleType, Is...>(
+  friend Zipped iter::impl14::zip_impl14<TupleType, Is...>(
       TupleType&&, std::index_sequence<Is...>);
 
   Zipped(TupleType&& containers) : containers_(std::move(containers)) {}
@@ -1354,14 +1354,14 @@ class iter::impl::Zipped {
 };
 
 template <typename TupleType, std::size_t... Is>
-iter::impl::Zipped<TupleType, Is...> iter::impl::zip_impl(
+iter::impl14::Zipped<TupleType, Is...> iter::impl14::zip_impl14(
     TupleType&& containers, std::index_sequence<Is...>) {
   return {std::move(containers)};
 }
 
 template <typename... Containers>
 auto iter::zip(Containers&&... containers) {
-  return impl::zip_impl(
+  return impl14::zip_impl14(
       std::tuple<Containers...>{std::forward<Containers>(containers)...},
       std::index_sequence_for<Containers...>{});
 }
@@ -1374,7 +1374,7 @@ auto iter::zip(Containers&&... containers) {
 #include <initializer_list>
 
 namespace iter {
-  namespace impl {
+  namespace impl15 {
     template <typename Index, typename Elem>
     using EnumBasePair = std::pair<Index, Elem>;
 
@@ -1395,21 +1395,21 @@ namespace iter {
 
     using EnumerateFn = IterToolFnOptionalBindSecond<Enumerable, std::size_t>;
   }
-  constexpr impl::EnumerateFn enumerate{};
+  constexpr impl15::EnumerateFn enumerate{};
 }
 
 namespace std {
   template <typename Index, typename Elem>
-  class tuple_size<iter::impl::EnumIterYield<Index, Elem>>
-      : public tuple_size<iter::impl::EnumBasePair<Index, Elem>> {};
+  class tuple_size<iter::impl15::EnumIterYield<Index, Elem>>
+      : public tuple_size<iter::impl15::EnumBasePair<Index, Elem>> {};
 
   template <std::size_t N, typename Index, typename Elem>
-  class tuple_element<N, iter::impl::EnumIterYield<Index, Elem>>
-      : public tuple_element<N, iter::impl::EnumBasePair<Index, Elem>> {};
+  class tuple_element<N, iter::impl15::EnumIterYield<Index, Elem>>
+      : public tuple_element<N, iter::impl15::EnumBasePair<Index, Elem>> {};
 }
 
 template <typename Container, typename Index>
-class iter::impl::Enumerable {
+class iter::impl15::Enumerable {
  private:
   Container container_;
   const Index start_;
@@ -1502,11 +1502,11 @@ class iter::impl::Enumerable {
 #include <unordered_set>
 
 namespace iter {
-  namespace impl {
+  namespace impl17 {
     struct UniqueEverseenFn : Pipeable<UniqueEverseenFn> {
       template <typename Container>
       auto operator()(Container&& container) const {
-        using elem_type = impl::iterator_deref<Container>;
+        using elem_type = impl17::iterator_deref<Container>;
         auto func = [elem_seen = std::unordered_set<std::decay_t<elem_type>>()](
             const std::remove_reference_t<elem_type>& e) mutable {
           return elem_seen.insert(e).second;
@@ -1516,7 +1516,7 @@ namespace iter {
     };
   }
 
-  constexpr impl::UniqueEverseenFn unique_everseen{};
+  constexpr impl17::UniqueEverseenFn unique_everseen{};
 }
 
 #endif
@@ -1526,17 +1526,17 @@ namespace iter {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl18 {
     template <typename Container>
     class CombinatorWithReplacement;
     using CombinationsWithReplacementFn =
         IterToolFnBindSizeTSecond<CombinatorWithReplacement>;
   }
-  constexpr impl::CombinationsWithReplacementFn combinations_with_replacement{};
+  constexpr impl18::CombinationsWithReplacementFn combinations_with_replacement{};
 }
 
 template <typename Container>
-class iter::impl::CombinatorWithReplacement {
+class iter::impl18::CombinatorWithReplacement {
  private:
   Container container_;
   std::size_t length_;
@@ -1653,17 +1653,17 @@ class iter::impl::CombinatorWithReplacement {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl19 {
     template <typename Container, typename AccumulateFunc>
     class Accumulator;
 
     using AccumulateFn = IterToolFnOptionalBindSecond<Accumulator, std::plus<>>;
   }
-  constexpr impl::AccumulateFn accumulate{};
+  constexpr impl19::AccumulateFn accumulate{};
 }
 
 template <typename Container, typename AccumulateFunc>
-class iter::impl::Accumulator {
+class iter::impl19::Accumulator {
  private:
   Container container_;
   mutable AccumulateFunc accumulate_func_;
@@ -1766,19 +1766,19 @@ class iter::impl::Accumulator {
 #include <array>
 
 namespace iter {
-  namespace impl {
+  namespace impl20 {
     template <typename TupleType, std::size_t... Is>
     class Productor;
 
     template <typename TupleType, std::size_t... Is>
-    Productor<TupleType, Is...> product_impl(
+    Productor<TupleType, Is...> product_impl20(
         TupleType&& containers, std::index_sequence<Is...>);
   }
 }
 
 template <typename TupleType, std::size_t... Is>
-class iter::impl::Productor {
-  friend Productor iter::impl::product_impl<TupleType, Is...>(
+class iter::impl20::Productor {
+  friend Productor iter::impl20::product_impl20<TupleType, Is...>(
       TupleType&&, std::index_sequence<Is...>);
 
  private:
@@ -1935,9 +1935,9 @@ class iter::impl::Productor {
   }
 };
 
-namespace iter::impl {
+namespace iter::impl20 {
   template <typename TupleType, std::size_t... Is>
-  Productor<TupleType, Is...> product_impl(
+  Productor<TupleType, Is...> product_impl20(
       TupleType&& containers, std::index_sequence<Is...>) {
     return {std::move(containers)};
   }
@@ -1946,7 +1946,7 @@ namespace iter::impl {
 namespace iter {
   template <typename... Containers>
   decltype(auto) product(Containers&&... containers) {
-    return impl::product_impl(
+    return impl20::product_impl20(
         std::tuple<Containers...>(std::forward<Containers>(containers)...),
         std::index_sequence_for<Containers...>{});
   }
@@ -1956,7 +1956,7 @@ namespace iter {
   }
 }
 
-namespace iter::impl {
+namespace iter::impl20 {
   // rvalue must be copied, lvalue and const lvalue references can be bound
   template <std::size_t... Is, typename Container>
   decltype(auto) product_repeat(
@@ -1980,7 +1980,7 @@ namespace iter::impl {
 namespace iter {
   template <std::size_t N, typename Container>
   decltype(auto) product(Container&& container) {
-    return impl::product_repeat(
+    return impl20::product_repeat(
         std::make_index_sequence<N>{}, std::forward<Container>(container));
   }
 }
@@ -1992,17 +1992,17 @@ namespace iter {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl24 {
     template <typename Container, typename Selector>
     class Compressed;
   }
 
   template <typename Container, typename Selector>
-  impl::Compressed<Container, Selector> compress(Container&&, Selector&&);
+  impl24::Compressed<Container, Selector> compress(Container&&, Selector&&);
 }
 
 template <typename Container, typename Selector>
-class iter::impl::Compressed {
+class iter::impl24::Compressed {
  private:
   Container container_;
   Selector selectors_;
@@ -2115,7 +2115,7 @@ class iter::impl::Compressed {
 };
 
 template <typename Container, typename Selector>
-iter::impl::Compressed<Container, Selector> iter::compress(
+iter::impl24::Compressed<Container, Selector> iter::compress(
     Container&& container_, Selector&& selectors_) {
   return {
       std::forward<Container>(container_), std::forward<Selector>(selectors_)};
@@ -2128,17 +2128,17 @@ iter::impl::Compressed<Container, Selector> iter::compress(
 
 
 namespace iter {
-  namespace impl {
+  namespace impl25 {
     template <typename FilterFunc, typename Container>
     class Taker;
 
     using TakeWhileFn = IterToolFnOptionalBindFirst<Taker, BoolTester>;
   }
-  constexpr impl::TakeWhileFn takewhile{};
+  constexpr impl25::TakeWhileFn takewhile{};
 }
 
 template <typename FilterFunc, typename Container>
-class iter::impl::Taker {
+class iter::impl25::Taker {
  private:
   Container container_;
   mutable FilterFunc filter_func_;
@@ -2262,12 +2262,12 @@ class iter::impl::Taker {
 #include <boost/optional.hpp>
 
 namespace iter {
-  namespace impl {
+  namespace impl27 {
     template <typename TupleType, std::size_t... Is>
     class ZippedLongest;
 
     template <typename TupleType, std::size_t... Is>
-    ZippedLongest<TupleType, Is...> zip_longest_impl(
+    ZippedLongest<TupleType, Is...> zip_longest_impl27(
         TupleType&&, std::index_sequence<Is...>);
   }
 
@@ -2276,10 +2276,10 @@ namespace iter {
 }
 
 template <typename TupleType, std::size_t... Is>
-class iter::impl::ZippedLongest {
+class iter::impl27::ZippedLongest {
  private:
   TupleType containers_;
-  friend ZippedLongest zip_longest_impl<TupleType, Is...>(
+  friend ZippedLongest zip_longest_impl27<TupleType, Is...>(
       TupleType&&, std::index_sequence<Is...>);
 
   template <std::size_t I, typename TupleTypeT>
@@ -2384,14 +2384,14 @@ class iter::impl::ZippedLongest {
 };
 
 template <typename TupleType, std::size_t... Is>
-iter::impl::ZippedLongest<TupleType, Is...> iter::impl::zip_longest_impl(
+iter::impl27::ZippedLongest<TupleType, Is...> iter::impl27::zip_longest_impl27(
     TupleType&& containers, std::index_sequence<Is...>) {
   return {std::move(containers)};
 }
 
 template <typename... Containers>
 auto iter::zip_longest(Containers&&... containers) {
-  return impl::zip_longest_impl(
+  return impl27::zip_longest_impl27(
       std::tuple<Containers...>{std::forward<Containers>(containers)...},
       std::index_sequence_for<Containers...>{});
 }
@@ -2403,7 +2403,7 @@ auto iter::zip_longest(Containers&&... containers) {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl29 {
     template <typename TupType, std::size_t... Is>
     class Chained;
 
@@ -2429,7 +2429,7 @@ namespace iter {
 }
 
 template <typename TupType, std::size_t... Is>
-class iter::impl::Chained {
+class iter::impl29::Chained {
  private:
   friend ChainMaker;
 
@@ -2581,7 +2581,7 @@ class iter::impl::Chained {
 };
 
 template <typename Container>
-class iter::impl::ChainedFromIterable {
+class iter::impl29::ChainedFromIterable {
  private:
   friend ChainFromIterableFn;
   Container container_;
@@ -2696,10 +2696,10 @@ class iter::impl::ChainedFromIterable {
   }
 };
 
-class iter::impl::ChainMaker {
+class iter::impl29::ChainMaker {
  private:
   template <typename TupleType, std::size_t... Is>
-  Chained<TupleType, Is...> chain_impl(
+  Chained<TupleType, Is...> chain_impl29(
       TupleType&& containers, std::index_sequence<Is...>) const {
     return {std::move(containers)};
   }
@@ -2708,7 +2708,7 @@ class iter::impl::ChainMaker {
   // expose regular call operator to provide usual chain()
   template <typename... Containers>
   auto operator()(Containers&&... cs) const {
-    return chain_impl(
+    return chain_impl29(
         std::tuple<Containers...>{std::forward<Containers>(cs)...},
         std::index_sequence_for<Containers...>{});
   }
@@ -2718,7 +2718,7 @@ class iter::impl::ChainMaker {
 
 namespace iter {
   namespace {
-    constexpr auto chain = iter::impl::ChainMaker{};
+    constexpr auto chain = iter::impl29::ChainMaker{};
   }
 }
 
@@ -2730,16 +2730,16 @@ namespace iter {
 #include <deque>
 
 namespace iter {
-  namespace impl {
+  namespace impl31 {
     template <typename Container>
     class WindowSlider;
     using SlidingWindowFn = IterToolFnBindSizeTSecond<WindowSlider>;
   }
-  constexpr impl::SlidingWindowFn sliding_window{};
+  constexpr impl31::SlidingWindowFn sliding_window{};
 }
 
 template <typename Container>
-class iter::impl::WindowSlider {
+class iter::impl31::WindowSlider {
  private:
   Container container_;
   std::size_t window_size_;
@@ -2849,16 +2849,16 @@ class iter::impl::WindowSlider {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl33 {
     template <typename Container, typename CompareFunc>
     class SortedView;
     using SortedFn = IterToolFnOptionalBindSecond<SortedView, std::less<>>;
   }
-  constexpr impl::SortedFn sorted{};
+  constexpr impl33::SortedFn sorted{};
 }
 
 template <typename Container, typename CompareFunc>
-class iter::impl::SortedView {
+class iter::impl33::SortedView {
  private:
   template <typename ContainerT, typename = void>
   class SortedItersHolder {
@@ -3015,17 +3015,17 @@ class iter::impl::SortedView {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl34 {
     template <typename T>
     class RepeaterWithCount;
   }
 
   template <typename T>
-  constexpr impl::RepeaterWithCount<T> repeat(T&&, int);
+  constexpr impl34::RepeaterWithCount<T> repeat(T&&, int);
 }
 
 template <typename T>
-class iter::impl::RepeaterWithCount {
+class iter::impl34::RepeaterWithCount {
   // see stackoverflow.com/questions/32174186/ about why this isn't
   // declaring just a specialization as friend
   template <typename U>
@@ -3095,22 +3095,22 @@ class iter::impl::RepeaterWithCount {
 };
 
 template <typename T>
-constexpr iter::impl::RepeaterWithCount<T> iter::repeat(T&& e, int count_) {
+constexpr iter::impl34::RepeaterWithCount<T> iter::repeat(T&& e, int count_) {
   return {std::forward<T>(e), count_ < 0 ? 0 : count_};
 }
 
 namespace iter {
-  namespace impl {
+  namespace impl34 {
     template <typename T>
     class Repeater;
   }
 
   template <typename T>
-  constexpr impl::Repeater<T> repeat(T&&);
+  constexpr impl34::Repeater<T> repeat(T&&);
 }
 
 template <typename T>
-class iter::impl::Repeater {
+class iter::impl34::Repeater {
   template <typename U>
   friend constexpr Repeater<U> iter::repeat(U&&);
 
@@ -3171,7 +3171,7 @@ class iter::impl::Repeater {
 };
 
 template <typename T>
-constexpr iter::impl::Repeater<T> iter::repeat(T&& e) {
+constexpr iter::impl34::Repeater<T> iter::repeat(T&& e) {
   return {std::forward<T>(e)};
 }
 
@@ -3182,17 +3182,17 @@ constexpr iter::impl::Repeater<T> iter::repeat(T&& e) {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl35 {
     template <typename FilterFunc, typename Container>
     class Dropper;
 
     using DropWhileFn = IterToolFnOptionalBindFirst<Dropper, BoolTester>;
   }
-  constexpr impl::DropWhileFn dropwhile{};
+  constexpr impl35::DropWhileFn dropwhile{};
 }
 
 template <typename FilterFunc, typename Container>
-class iter::impl::Dropper {
+class iter::impl35::Dropper {
  private:
   Container container_;
   mutable FilterFunc filter_func_;
@@ -3312,7 +3312,7 @@ class iter::impl::Dropper {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl37 {
     struct UniqueJustseenFn : Pipeable<UniqueJustseenFn> {
       template <typename Container>
       auto operator()(Container&& container) const {
@@ -3323,7 +3323,7 @@ namespace iter {
       }
     };
   }
-  constexpr impl::UniqueJustseenFn unique_justseen{};
+  constexpr impl37::UniqueJustseenFn unique_justseen{};
 }
 
 #endif
@@ -3333,7 +3333,7 @@ namespace iter {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl38 {
     template <typename Func, typename Container>
     class StarMapper;
 
@@ -3349,7 +3349,7 @@ namespace iter {
 
 // starmap with a container_<T> where T is one of tuple, pair, array
 template <typename Func, typename Container>
-class iter::impl::StarMapper {
+class iter::impl38::StarMapper {
  private:
   mutable Func func_;
   Container container_;
@@ -3430,7 +3430,7 @@ class iter::impl::StarMapper {
 
 // starmap for a tuple or pair of tuples or pairs
 template <typename Func, typename TupType, std::size_t... Is>
-class iter::impl::TupleStarMapper {
+class iter::impl38::TupleStarMapper {
  private:
   mutable Func func_;
   TupType tup_;
@@ -3532,7 +3532,7 @@ class iter::impl::TupleStarMapper {
   }
 };
 
-struct iter::impl::StarMapFn : PipeableAndBindFirst<StarMapFn> {
+struct iter::impl38::StarMapFn : PipeableAndBindFirst<StarMapFn> {
  private:
   template <typename Func, typename TupType, std::size_t... Is>
   TupleStarMapper<Func, TupType, Is...> helper_with_tuples(
@@ -3565,7 +3565,7 @@ struct iter::impl::StarMapFn : PipeableAndBindFirst<StarMapFn> {
 };
 
 namespace iter {
-  constexpr impl::StarMapFn starmap{};
+  constexpr impl38::StarMapFn starmap{};
 }
 
 #endif
@@ -3575,7 +3575,7 @@ namespace iter {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl39 {
     template <typename Container, typename DifferenceType>
     class Sliced;
 
@@ -3584,7 +3584,7 @@ namespace iter {
 }
 
 template <typename Container, typename DifferenceType>
-class iter::impl::Sliced {
+class iter::impl39::Sliced {
  private:
   Container container_;
   DifferenceType start_;
@@ -3686,7 +3686,7 @@ class iter::impl::Sliced {
   }
 };
 
-struct iter::impl::SliceFn {
+struct iter::impl39::SliceFn {
  private:
   template <typename DifferenceType>
   class FnPartial : public Pipeable<FnPartial<DifferenceType>> {
@@ -3719,7 +3719,7 @@ struct iter::impl::SliceFn {
   // only given the end, assume step_ is 1 and begin is 0
   template <typename Container, typename DifferenceType,
       typename = std::enable_if_t<is_iterable<Container>>>
-  iter::impl::Sliced<Container, DifferenceType> operator()(
+  iter::impl39::Sliced<Container, DifferenceType> operator()(
       Container&& container, DifferenceType stop) const {
     return {std::forward<Container>(container), 0, stop, 1};
   }
@@ -3740,7 +3740,7 @@ struct iter::impl::SliceFn {
 };
 
 namespace iter {
-  constexpr impl::SliceFn slice{};
+  constexpr impl39::SliceFn slice{};
 }
 
 #endif
@@ -3750,7 +3750,7 @@ namespace iter {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl41 {
     template <typename Container>
     using reverse_iterator_type =
         decltype(std::rbegin(std::declval<Container&>()));
@@ -3777,8 +3777,8 @@ namespace iter {
     template <typename Container>
     using ReverseIteratorWrapper =
         typename ReverseIteratorWrapperImplType<Container,
-            std::is_same_v<impl::reverse_iterator_type<Container>,
-                                                    impl::
+            std::is_same_v<impl41::reverse_iterator_type<Container>,
+                                                    impl41::
                                                         reverse_iterator_end_type<Container>>>::
             type;
 
@@ -3787,11 +3787,11 @@ namespace iter {
 
     using ReversedFn = IterToolFn<Reverser>;
   }
-  constexpr impl::ReversedFn reversed{};
+  constexpr impl41::ReversedFn reversed{};
 }
 
 template <typename Container>
-class iter::impl::Reverser {
+class iter::impl41::Reverser {
  private:
   Container container_;
   friend ReversedFn;
@@ -3883,7 +3883,7 @@ class iter::impl::Reverser {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl44 {
     template <typename FilterFunc, typename Container>
     class Filtered;
 
@@ -3897,11 +3897,11 @@ namespace iter {
     using FilterFn = IterToolFnOptionalBindFirst<Filtered, BoolTester>;
   }
 
-  constexpr impl::FilterFn filter{};
+  constexpr impl44::FilterFn filter{};
 }
 
 template <typename FilterFunc, typename Container>
-class iter::impl::Filtered {
+class iter::impl44::Filtered {
  private:
   Container container_;
   mutable FilterFunc filter_func_;
@@ -4057,17 +4057,17 @@ namespace iter {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl47 {
     template <typename Container>
     class Powersetter;
 
     using PowersetFn = IterToolFn<Powersetter>;
   }
-  constexpr impl::PowersetFn powerset{};
+  constexpr impl47::PowersetFn powerset{};
 }
 
 template <typename Container>
-class iter::impl::Powersetter {
+class iter::impl47::Powersetter {
  private:
   Container container_;
   template <typename T>
@@ -4180,17 +4180,17 @@ class iter::impl::Powersetter {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl48 {
     template <typename Container>
     class Cycler;
 
     using CycleFn = IterToolFn<Cycler>;
   }
-  constexpr impl::CycleFn cycle{};
+  constexpr impl48::CycleFn cycle{};
 }
 
 template <typename Container>
-class iter::impl::Cycler {
+class iter::impl48::Cycler {
  private:
   friend CycleFn;
 
@@ -4283,17 +4283,17 @@ class iter::impl::Cycler {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl51 {
     template <typename Container>
     class Combinator;
 
     using CombinationsFn = IterToolFnBindSizeTSecond<Combinator>;
   }
-  constexpr impl::CombinationsFn combinations{};
+  constexpr impl51::CombinationsFn combinations{};
 }
 
 template <typename Container>
-class iter::impl::Combinator {
+class iter::impl51::Combinator {
  private:
   Container container_;
   std::size_t length_;
@@ -4431,16 +4431,16 @@ class iter::impl::Combinator {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl52 {
     template <typename Container>
     class Permuter;
     using PermutationsFn = IterToolFn<Permuter>;
   }
-  constexpr impl::PermutationsFn permutations{};
+  constexpr impl52::PermutationsFn permutations{};
 }
 
 template <typename Container>
-class iter::impl::Permuter {
+class iter::impl52::Permuter {
  private:
   friend PermutationsFn;
   Container container_;
@@ -4552,17 +4552,17 @@ class iter::impl::Permuter {
 #include <exception>
 
 namespace iter {
-  namespace impl {
+  namespace impl54 {
     template <typename T>
     class Range;
   }
 
   template <typename T>
-  constexpr impl::Range<T> range(T) noexcept;
+  constexpr impl54::Range<T> range(T) noexcept;
   template <typename T>
-  constexpr impl::Range<T> range(T, T) noexcept;
+  constexpr impl54::Range<T> range(T, T) noexcept;
   template <typename T>
-  constexpr impl::Range<T> range(T, T, T) noexcept;
+  constexpr impl54::Range<T> range(T, T, T) noexcept;
 }
 
 namespace iter {
@@ -4646,7 +4646,7 @@ namespace iter {
 }
 
 template <typename T>
-class iter::impl::Range {
+class iter::impl54::Range {
   // see stackoverflow.com/questions/32174186 about why only specializations
   // aren't marked as friend
   template <typename U>
@@ -4722,7 +4722,7 @@ class iter::impl::Range {
 
     // first argument must be regular iterator
     // second argument must be end iterator
-    static bool not_equal_to_impl(
+    static bool not_equal_to_impl54(
         const Iterator& lhs, const Iterator& rhs) noexcept {
       assert(!lhs.is_end);
       assert(rhs.is_end);
@@ -4733,9 +4733,9 @@ class iter::impl::Range {
     static bool not_equal_to_end(
         const Iterator& lhs, const Iterator& rhs) noexcept {
       if (rhs.is_end) {
-        return not_equal_to_impl(lhs, rhs);
+        return not_equal_to_impl54(lhs, rhs);
       }
-      return not_equal_to_impl(rhs, lhs);
+      return not_equal_to_impl54(rhs, lhs);
     }
 
    public:
@@ -4816,20 +4816,20 @@ class iter::impl::Range {
 };
 
 template <typename T>
-constexpr iter::impl::Range<T> iter::range(T stop_) noexcept {
+constexpr iter::impl54::Range<T> iter::range(T stop_) noexcept {
   return {stop_};
 }
 
 template <typename T>
-constexpr iter::impl::Range<T> iter::range(T start_, T stop_) noexcept {
+constexpr iter::impl54::Range<T> iter::range(T start_, T stop_) noexcept {
   return {start_, stop_};
 }
 
 template <typename T>
-constexpr iter::impl::Range<T> iter::range(
+constexpr iter::impl54::Range<T> iter::range(
     T start_, T stop_, T step_) noexcept {
-  return step_ == T(0) ? impl::Range<T>{0}
-                       : impl::Range<T>{start_, stop_, step_};
+  return step_ == T(0) ? impl54::Range<T>{0}
+                       : impl54::Range<T>{start_, stop_, step_};
 }
 
 #endif
@@ -4839,12 +4839,12 @@ constexpr iter::impl::Range<T> iter::range(
 
 
 namespace iter {
-  namespace impl {
+  namespace impl56 {
     struct IMapFn : PipeableAndBindFirst<IMapFn> {
       template <typename MapFunc, typename... Containers>
       auto operator()(MapFunc map_func, Containers&&... containers) const
           // explicitly specifying type here to allow more expressions that only
-          // care about the type, and don't need a valid implementation.
+          // care about the type, and don't need a valid impl56ementation.
           // See #66
           -> StarMapper<MapFunc,
               decltype(zip(std::forward<Containers>(containers)...))> {
@@ -4853,7 +4853,7 @@ namespace iter {
       using PipeableAndBindFirst<IMapFn>::operator();
     };
   }
-  constexpr impl::IMapFn imap{};
+  constexpr impl56::IMapFn imap{};
 }
 
 #endif
@@ -4865,7 +4865,7 @@ namespace iter {
 
 
 namespace iter {
-  namespace impl {
+  namespace impl57 {
     template <typename Container, typename KeyFunc>
     class GroupProducer;
 
@@ -4878,11 +4878,11 @@ namespace iter {
 
     using GroupByFn = IterToolFnOptionalBindSecond<GroupProducer, Identity>;
   }
-  constexpr impl::GroupByFn groupby{};
+  constexpr impl57::GroupByFn groupby{};
 }
 
 template <typename Container, typename KeyFunc>
-class iter::impl::GroupProducer {
+class iter::impl57::GroupProducer {
  private:
   Container container_;
   mutable KeyFunc key_func_;
@@ -4958,7 +4958,7 @@ class iter::impl::GroupProducer {
 
     ~Iterator() = default;
 
-    // NOTE the implicitly generated move constructor would
+    // NOTE the impl57icitly generated move constructor would
     // be wrong
 
     KeyGroupPair<ContainerT>& operator*() {
