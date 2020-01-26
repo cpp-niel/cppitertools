@@ -23,12 +23,13 @@ def add_internal_headers(included_headers, target_file):
 
 
 def add_headers(included_headers, target_file):
-    add_header('./filter.hpp', 8, included_headers, target_file)
+    add_header('./filter.hpp', 7, included_headers, target_file)
     add_header('./starmap.hpp', 8, included_headers, target_file)
+    add_header('./zip.hpp', 9, included_headers, target_file)
     directory = os.fsencode('./')
     for index, file in enumerate(sorted(os.listdir(directory))):
         filename = os.fsdecode(file)
-        if filename.endswith('.hpp') and not filename in ['single_header.hpp', 'filter.hpp', 'starmap.hpp', 'zip_longest.hpp']:
+        if filename.endswith('.hpp') and not filename in ['single_header.hpp', 'filter.hpp', 'starmap.hpp', 'zip.hpp', 'zip_longest.hpp']:
             add_header(filename, 10 + index, included_headers, target_file)
 
 
